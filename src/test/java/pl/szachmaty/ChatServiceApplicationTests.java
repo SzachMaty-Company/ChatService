@@ -1,4 +1,4 @@
-package pl.szachmaty.chatservice;
+package pl.szachmaty;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
