@@ -1,4 +1,4 @@
-package pl.szachmaty.chatservice;
+package pl.szachmaty;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
