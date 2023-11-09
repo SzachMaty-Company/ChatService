@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="Stomp.js"></script>
+    <script>
+        let stompClient = null;
+        function connect() {
+            let socket  = new SockJS("http://localhost:8124/registerws")
+            stompClient = Stomp.over(socket);
+            console.log("connected")
+            stompClient.connect({}, (frame) => {
+                stompClient.subscribe("/topic/chat", (messageOutput) => {
+                    console.log(messageOutput);
+                    showMessage(JSON.parse(messageOutput.body))
+                })
+            })
+        }
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+                console.log("disconnected!")
+            }
+        }
+        function showMessage(messageOutput) {
+            const response = document.getElementById("response")
+            const newP = document.createElement('p')
+            newP.appendChild(document.createTextNode(messageOutput.sender + " : " + messageOutput.value))
+            response.appendChild(newP);
+        }
+        function sendMessage() {
+            const from = document.getElementById("from").value;
+            const value = document.getElementById("message-input").value;
+            stompClient.send("/app/chat", {}, JSON.stringify(
+                {
+                    "sender": from,
+                    "value": value
+                }))
+        }
+    </script>
+</head>
+<body>
+<div>
+    <input type="text" id="from" placeholder="Choose a nickname"/>
+</div>
+<div>
+    <button id="connect_btn" onclick="connect()">Connect</button>
+    <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
+    <input type="text" id="message-input"/>
+    <button id="send_btn" onclick="sendMessage()">Send message</button>
+</div>
+<div>
+    <p id="response"></p>
+</div>
+</body>
+</html>
