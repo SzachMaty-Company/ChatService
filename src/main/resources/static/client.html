@@ -12,11 +12,15 @@
             stompClient = Stomp.over(socket);
             console.log("connected")
             stompClient.connect({}, (frame) => {
-                stompClient.subscribe("/topic/chat", (messageOutput) => {
+  
+            })
+        }
+        function subscribe() {
+            stompClient.subscribe("/topic/chat", (messageOutput) => {
                     console.log(messageOutput);
                     showMessage(JSON.parse(messageOutput.body))
                 })
-            })
+            console.log("Subscribed!")
         }
         function disconnect() {
             if(stompClient != null) {
@@ -42,11 +46,13 @@
     </script>
 </head>
 <body>
-<div>
-    <input type="text" id="from" placeholder="Choose a nickname"/>
-</div>
+
 <div>
     <button id="connect_btn" onclick="connect()">Connect</button>
+    <button id="sub_btn" onclick="subscribe()">Subscribe</button>
+    <div>
+        <input type="text" id="from" placeholder="Choose a nickname"/>
+    </div>
     <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
     <input type="text" id="message-input"/>
     <button id="send_btn" onclick="sendMessage()">Send message</button>
