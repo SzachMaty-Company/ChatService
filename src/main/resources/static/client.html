@@ -43,6 +43,15 @@
                     "value": value
                 }))
         }
+        function testCors()
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", "http://localhost:8080/test"); // false for synchronous request
+            xmlHttp.send( null );
+            console.log(xmlHttp.responseText)
+            console.log("CORSY DZIALAJA JAK NIE MA ERORRU!")
+            // return xmlHttp.responseText;
+        }
     </script>
 </head>
 <body>
@@ -56,6 +65,7 @@
     <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
     <input type="text" id="message-input"/>
     <button id="send_btn" onclick="sendMessage()">Send message</button>
+    <button id="test_cors" onclick="testCors()">Click to test your cors!</button>
 </div>
 <div>
     <p id="response"></p>
