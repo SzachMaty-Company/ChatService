@@ -6,8 +6,14 @@ If you don't have docker installed on your system:
 - On Windows:
 `winget install Docker.DockerDesktop`
 
+### Build Jar
+`./gradlew bootJar`
+
+#### Build an docker image
+`docker build -t szachmaty/chat-service .`
+
 #### Run a container
-`docker run -p 8124:8080 chat-service`
+`docker run -p 8124:8080 szachmaty/chat-service`
 
 #### Test if app is running:
 `curl http://localhost:8124/test`
