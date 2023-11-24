@@ -3,29 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="Stomp.js"></script>
+    <!--    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+    <!--    <script src="Stomp.js"></script>-->
     <script>
-        let stompClient = null;
-        function connect() {
-            let socket  = new SockJS("http://localhost:8124/registerws")
-            stompClient = Stomp.over(socket);
-            console.log("connected")
-            stompClient.connect({}, (frame) => {
-  
-            })
+        let client = null;
+        let subscription = null;
+
+        function callback(message) {
+            alert(message.body);
         }
-        function subscribe() {
-            stompClient.subscribe("/topic/chat", (messageOutput) => {
-                    console.log(messageOutput);
-                    showMessage(JSON.parse(messageOutput.body))
-                })
-            console.log("Subscribed!")
+        function debugCallback(str) {
+            console.debug(str)
+        }
+
+        function connect() {
+            client = new StompJs.Client({
+                brokerURL: "ws://localhost:8124/registerws",
+                debug: debugCallback
+            })
+
+            client.onConnect = function (frame) {
+                subscription = client.subscribe("/topic/chat", callback);
+                console.log("subscribed");
+            }
+            console.log("client activated");
+            client.activate();
+            console.log("client connected");
         }
         function disconnect() {
-            if(stompClient != null) {
-                stompClient.disconnect();
-                console.log("disconnected!")
+            if (client) {
+                console.log("client deactivated")
+                client.deactivate();
+            }
+
+            if (subscription) {
+                console.log("unsubscribing")
+                subscription.unsubscribe();
             }
         }
         function showMessage(messageOutput) {
@@ -37,11 +51,13 @@
         function sendMessage() {
             const from = document.getElementById("from").value;
             const value = document.getElementById("message-input").value;
-            stompClient.send("/app/chat", {}, JSON.stringify(
-                {
+            client.publish({
+                destination: "/app/chat",
+                body: JSON.stringify({
                     "sender": from,
                     "value": value
-                }))
+                })
+            })
         }
         function testCors()
         {
