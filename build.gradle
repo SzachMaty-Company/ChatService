@@ -32,3 +32,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    destinationDirectory = file('lib')
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
+}
