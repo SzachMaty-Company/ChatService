@@ -21,4 +21,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", conf);
         return source;
     }
+
 }

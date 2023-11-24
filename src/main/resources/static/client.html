@@ -59,14 +59,19 @@
                 })
             })
         }
-        function testCors()
-        {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", "http://localhost:8080/test"); // false for synchronous request
-            xmlHttp.send( null );
-            console.log(xmlHttp.responseText)
-            console.log("CORSY DZIALAJA JAK NIE MA ERORRU!")
-            // return xmlHttp.responseText;
+
+        async function testCors() {
+            try {
+                const response = await fetch("http://localhost:8124/test", {
+                    method: "GET",
+                })
+
+                console.log(response)
+                const json = await response.json();
+                console.log(json);
+            } catch (e) {
+                console.log(e);
+            }
         }
     </script>
 </head>
