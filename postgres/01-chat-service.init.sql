@@ -3,7 +3,7 @@ create schema chat_service;
 create table if not exists chat_service.user (
     id int generated always as identity primary key,
     "name" text not null,
-    "surname" text not null
+    surname text not null
 );
 
 create table if not exists chat_service.message (
@@ -16,7 +16,7 @@ create table if not exists chat_service.chat (
     id int generated always as identity primary key
 );
 
-create table if not exists chat_service.chat_user (
+create table if not exists chat_service.user_chat (
     user_id int not null,
     chat_id int not null,
 

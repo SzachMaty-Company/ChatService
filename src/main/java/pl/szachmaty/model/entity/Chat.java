@@ -9,22 +9,19 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "`user`")
-public class User {
+@Table(name = "chat")
+public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String surname;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_chat",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id")
+            joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<Chat> chats;
+    private Set<User> chatMembers;
 
 }
