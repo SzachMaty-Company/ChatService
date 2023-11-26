@@ -1,6 +1,7 @@
 package pl.szachmaty.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -37,11 +38,12 @@ public class ChatController {
         return ResponseEntity.ok(chatsDto);
     }
 
-    @PostMapping(path = "/chat/{chatId}")
+//    for testing
+    @Profile("dev")
+    @PostMapping(path = "/chat/{chatId}/sender/{senderId}")
     ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto,
-                                           @PathVariable Long chatId) {
-        // TODO: get this from the principal
-        final var senderId = 0L;
+                                           @PathVariable Long chatId,
+                                           @PathVariable Long senderId) {
         messageSendingService.sendMessage(messageInputDto, chatId, senderId);
         return ResponseEntity.noContent().build();
     }

@@ -17,9 +17,11 @@ public class MessageOutputDto {
 
     public static MessageOutputDto convert(Message message) {
         var dto = new MessageOutputDto();
+        dto.setChatId(message.getChat().getId());
         dto.setMessage(message.getMessage());
         dto.setSenderId(message.getSender().getId());
         dto.setTimestamp(message.getTimestamp());
+
         return dto;
     }
 
