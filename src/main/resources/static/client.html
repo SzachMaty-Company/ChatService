@@ -15,16 +15,16 @@
             let ul = [];
             for (const m of messages) {
                 const li = document.createElement("li");
-                li.innerHTML = m;
+
+                li.innerHTML = `<p><span>chat: ${m.chatId} sender: ${m.senderId}: </span>${m.message}</p>`
                 ul.push(li);
             }
             document.querySelector("#messages")
-                .replaceChildren(ul);
+                .replaceChildren(...ul);
         }
 
         function callback(message) {
-            messages.push(message.body)
-            console.log("received message", message.body)
+            messages.push(JSON.parse(message.body));
             displayMessages(messages);
         }
 
@@ -32,13 +32,14 @@
             console.debug(str)
         }
 
-        function connect() {
+        async function connect() {
             client = new StompJs.Client({
                 brokerURL: "ws://localhost:8124/registerws",
                 debug: debugCallback
             })
 
             const userId = document.getElementById("user-id").value;
+            const chatId = document.getElementById("chat-id").value;
 
             client.onConnect = function (frame) {
                 const url = `/user/${userId}/messages`
@@ -49,6 +50,22 @@
             console.log("client activated");
             client.activate();
             console.log("client connected");
+
+            let response;
+            try {
+                response = await fetch(`http://localhost:8124/chat/${chatId}/messages`, {
+                    method: "GET"
+                });
+                const data = await response.json();
+                messages = data.content;
+                // console.log(data.content[0])
+                // .map(m => m.message)
+                displayMessages(messages)
+            } catch (e) {
+                console.error(e);
+            } finally {
+                console.log("messages fetched with status:", response.status);
+            }
         }
 
         function disconnect() {
