@@ -38,7 +38,8 @@ public class ChatController {
     }
 
     @PostMapping(path = "/chat/{chatId}")
-    ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto, @PathVariable Long chatId) {
+    ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto,
+                                           @PathVariable Long chatId) {
         // TODO: get this from the principal
         final var senderId = 0L;
         messageSendingService.sendMessage(messageInputDto, chatId, senderId);
