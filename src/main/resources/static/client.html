@@ -6,31 +6,68 @@
     <!--    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
     <!--    <script src="Stomp.js"></script>-->
-    <script>
+    <script defer>
         let client = null;
         let subscription = null;
+        let messages = [];
+
+        function displayMessages(messages) {
+            let ul = [];
+            for (const m of messages) {
+                const li = document.createElement("li");
+
+                li.innerHTML = `<p><span>chat: ${m.chatId} sender: ${m.senderId}: </span>${m.message}</p>`
+                ul.push(li);
+            }
+            document.querySelector("#messages")
+                .replaceChildren(...ul);
+        }
 
         function callback(message) {
-            alert(message.body);
+            messages.push(JSON.parse(message.body));
+            displayMessages(messages);
         }
+
         function debugCallback(str) {
             console.debug(str)
         }
 
-        function connect() {
+        async function connect() {
             client = new StompJs.Client({
                 brokerURL: "ws://localhost:8124/registerws",
                 debug: debugCallback
             })
 
+            const userId = document.getElementById("user-id").value;
+            const chatId = document.getElementById("chat-id").value;
+
             client.onConnect = function (frame) {
-                subscription = client.subscribe("/topic/chat", callback);
-                console.log("subscribed");
+                const url = `/user/${userId}/messages`
+                subscription = client.subscribe(url, callback);
+                console.log({ subscription })
+                console.log("subscribed to", url);
             }
             console.log("client activated");
             client.activate();
             console.log("client connected");
+
+            let response;
+            try {
+                response = await fetch(`http://localhost:8124/chat/${chatId}/messages`, {
+                    method: "GET"
+                });
+                const data = await response.json();
+                messages = data.content;
+                // console.log(data.content[0])
+                // .map(m => m.message)
+                displayMessages(messages)
+            } catch (e) {
+                console.error(e);
+            } finally {
+                console.log("messages fetched with status:", response.status);
+            }
         }
+
         function disconnect() {
             if (client) {
                 console.log("client deactivated")
@@ -42,22 +79,28 @@
                 subscription.unsubscribe();
             }
         }
-        function showMessage(messageOutput) {
-            const response = document.getElementById("response")
-            const newP = document.createElement('p')
-            newP.appendChild(document.createTextNode(messageOutput.sender + " : " + messageOutput.value))
-            response.appendChild(newP);
-        }
-        function sendMessage() {
-            const from = document.getElementById("from").value;
-            const value = document.getElementById("message-input").value;
-            client.publish({
-                destination: "/app/chat",
-                body: JSON.stringify({
-                    "sender": from,
-                    "value": value
+
+        async function sendMessage() {
+            const chatId = document.getElementById("chat-id").value;
+            const userId = document.getElementById("user-id").value;
+
+            const message = document.getElementById("message-input").value;
+            let response;
+
+            try {
+                response = await fetch(`http://localhost:8124/chat/${chatId}/sender/${userId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({message})
                 })
-            })
+
+            } catch (e) {
+                console.error(e);
+            } finally {
+                console.log("message send status:", response.status)
+            }
         }
 
         async function testCors() {
@@ -77,19 +120,64 @@
 </head>
 <body>
 
-<div>
-    <button id="connect_btn" onclick="connect()">Connect</button>
-    <button id="sub_btn" onclick="subscribe()">Subscribe</button>
+<div class="wrapper">
     <div>
-        <input type="text" id="from" placeholder="Choose a nickname"/>
+        <div class="connection-wrapper">
+            <label for="chat-id">
+                chat id
+                <input type="text" id="chat-id" placeholder="chat id..."/>
+            </label>
+            <label for="user-id">
+                user id
+                <input type="text" id="user-id" placeholder="user id..."/>
+            </label>
+        </div>
+        <button id="connect_btn" onclick="connect()">Connect</button>
+        <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
     </div>
-    <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
-    <input type="text" id="message-input"/>
-    <button id="send_btn" onclick="sendMessage()">Send message</button>
-    <button id="test_cors" onclick="testCors()">Click to test your cors!</button>
+
+    <!--    <button id="sub_btn" onclick="subscribe()">Subscribe</button>-->
+<!--    <div>-->
+<!--        <input type="text" id="from" placeholder="Choose a nickname"/>-->
+<!--    </div>-->
+
+    <button onclick="displayMessages([])">test messages</button>
+    <label>
+        message
+        <input type="text" id="message-input" placeholder="message..."/>
+        <button id="send_btn" onclick="sendMessage()">Send</button>
+    </label>
+
+
+<!--    <button id="test_cors" onclick="testCors()">Click to test cors</button>-->
 </div>
+
 <div>
-    <p id="response"></p>
+    <h1>messages</h1>
+    <ul id="messages"></ul>
 </div>
+
 </body>
+<style>
+    * {
+        font-family: sans-serif;
+        box-sizing: border-box;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1ch;
+    }
+
+    .connection-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .connection-wrapper > * {
+        width: fit-content;
+    }
+
+</style>
 </html>
