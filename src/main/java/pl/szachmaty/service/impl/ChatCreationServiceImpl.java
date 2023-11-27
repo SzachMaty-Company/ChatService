@@ -18,9 +18,9 @@ public class ChatCreationServiceImpl implements ChatCreationService {
     private final UserRepository userRepository;
 
     @Override
-    public Long createChat(Set<Long> chatMembersId) {
+    public Long createChat(Set<Long> chatMembersIds) {
         var chat = new Chat();
-        var members = chatMembersId.stream()
+        var members = chatMembersIds.stream()
                 .map(userRepository::getReferenceById)
                 .collect(Collectors.toSet());
 

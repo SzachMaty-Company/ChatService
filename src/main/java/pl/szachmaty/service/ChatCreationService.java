@@ -4,6 +4,6 @@ import java.util.Set;
 
 public interface ChatCreationService {
 
-    Long createChat(Set<Long> chatMembersId);
+    Long createChat(Set<Long> chatMembersIds);
 
 }
