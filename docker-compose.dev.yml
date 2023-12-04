@@ -1,7 +1,16 @@
 services:
-  db:
+  chat-service:
+    image: szachmaty/chat-service
+    ports:
+      - 8124:8124
+    depends_on:
+      - chat-service-db
+    networks:
+      - chat-service-network
+
+  chat-service-db:
     image: postgres
-    container_name: postgres
+    container_name: chat-service-db
     environment:
       POSTGRES_PASSWORD: Password1!
       POSTGRES_USER: dev
@@ -9,3 +18,10 @@ services:
       - 5432:5432
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
+    networks:
+      - chat-service-network
+
+networks:
+  chat-service-network:
+    driver: bridge
+

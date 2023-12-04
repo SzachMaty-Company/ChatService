@@ -43,7 +43,7 @@ public class ChatController {
         return ResponseEntity.ok(chatsDto);
     }
 
-    @Profile("dev")
+    @Profile({"dev", "local"})
     @PostMapping(path = "/chat/{chatId}/sender/{senderId}")
     ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto,
                                            @PathVariable Long chatId,
@@ -52,7 +52,7 @@ public class ChatController {
         return ResponseEntity.noContent().build();
     }
 
-    @Profile("dev")
+    @Profile({"dev", "local"})
     @PostMapping(path = "/chat")
     ResponseEntity<ChatCreationOutputDto> createChat(@RequestBody ChatCreationInputDto chatCreationInputDto) {
         var chatId = chatCreationService.createChat(chatCreationInputDto.getChatMembersIds());
