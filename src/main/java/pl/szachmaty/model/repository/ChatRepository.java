@@ -13,7 +13,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("select ch from Chat ch left join fetch ch.chatMembers where ch.id = :chatId")
     Optional<Chat> findChatFetchMembers(Long chatId);
 
-    @Query("select ch from Chat ch where :userId in ch.chatMembers")
+    @Query(value = "select u.chats from User u where u.id = :userId")
     Slice<Chat> findUserChats(Long userId, Pageable pageable);
 
 }

@@ -34,7 +34,7 @@ public class ChatController {
         return message;
     }
 
-    @GetMapping(path = "/{userId}/chats")
+    @GetMapping(path = "/user/{userId}/chats")
     ResponseEntity<Slice<ChatOutputDto>> getChatsForUser(@PathVariable Long userId,
                                                          Pageable pageable) {
         var chats = chatListService.getUserChats(userId, pageable);
