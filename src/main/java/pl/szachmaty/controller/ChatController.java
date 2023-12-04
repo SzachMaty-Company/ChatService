@@ -25,16 +25,16 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatController {
 
-    ChatListService chatListService;
-    ChatCreationService chatCreationService;
-    MessageSendingService messageSendingService;
+    private final ChatListService chatListService;
+    private final ChatCreationService chatCreationService;
+    private final MessageSendingService messageSendingService;
 
     @MessageMapping("/chat")
     Message sendMessage(@Payload Message message) {
         return message;
     }
 
-    @GetMapping(path = "/{userId}/chats")
+    @GetMapping(path = "/user/{userId}/chats")
     ResponseEntity<Slice<ChatOutputDto>> getChatsForUser(@PathVariable Long userId,
                                                          Pageable pageable) {
         var chats = chatListService.getUserChats(userId, pageable);
@@ -43,7 +43,7 @@ public class ChatController {
         return ResponseEntity.ok(chatsDto);
     }
 
-    @Profile("dev")
+    @Profile({"dev", "local"})
     @PostMapping(path = "/chat/{chatId}/sender/{senderId}")
     ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto,
                                            @PathVariable Long chatId,
@@ -52,7 +52,7 @@ public class ChatController {
         return ResponseEntity.noContent().build();
     }
 
-    @Profile("dev")
+    @Profile({"dev", "local"})
     @PostMapping(path = "/chat")
     ResponseEntity<ChatCreationOutputDto> createChat(@RequestBody ChatCreationInputDto chatCreationInputDto) {
         var chatId = chatCreationService.createChat(chatCreationInputDto.getChatMembersIds());

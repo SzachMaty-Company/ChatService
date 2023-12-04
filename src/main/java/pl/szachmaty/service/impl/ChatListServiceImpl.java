@@ -1,5 +1,6 @@
 package pl.szachmaty.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,10 @@ import pl.szachmaty.model.repository.ChatRepository;
 import pl.szachmaty.service.ChatListService;
 
 @Service
+@AllArgsConstructor
 public class ChatListServiceImpl implements ChatListService {
 
-    ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
     @Override
     public Slice<Chat> getUserChats(Long userId, Pageable pageable) {

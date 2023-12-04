@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-@Profile("dev")
+@Profile({"dev", "local"})
 @CrossOrigin
 @RestController
 public class TestController {
