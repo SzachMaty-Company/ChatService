@@ -25,9 +25,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatController {
 
-    ChatListService chatListService;
-    ChatCreationService chatCreationService;
-    MessageSendingService messageSendingService;
+    private final ChatListService chatListService;
+    private final ChatCreationService chatCreationService;
+    private final MessageSendingService messageSendingService;
 
     @MessageMapping("/chat")
     Message sendMessage(@Payload Message message) {
