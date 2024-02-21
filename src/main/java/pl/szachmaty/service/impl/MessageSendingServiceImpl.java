@@ -1,6 +1,7 @@
 package pl.szachmaty.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import pl.szachmaty.model.dto.MessageInputDto;
@@ -19,6 +20,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatRepository chatRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public void sendMessage(MessageInputDto messageInputDto, Long chatId, Long senderId) {
@@ -28,7 +30,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
         message.setChat(chatRepository.getReferenceById(chatId));
 
         var savedMessage = messageRepository.save(message);
-        var messageDto = MessageOutputDto.convert(savedMessage);
+        var messageDto = modelMapper.map(savedMessage, MessageOutputDto.class);
 
         var chat = chatRepository.findChatFetchMembers(chatId).orElseThrow();
         var members = chat.getChatMembers();

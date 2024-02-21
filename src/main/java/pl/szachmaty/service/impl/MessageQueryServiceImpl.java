@@ -1,6 +1,7 @@
 package pl.szachmaty.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,11 @@ import java.util.List;
 public class MessageQueryServiceImpl implements MessageQueryService {
 
     private final MessageRepository messageRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Slice<MessageOutputDto> findMessages(Long chatId, Pageable pageable) {
         return messageRepository.findMessagesByChatIdOrderByTimestamp(chatId, pageable)
-                .map(MessageOutputDto::convert);
+                .map(m -> modelMapper.map(m, MessageOutputDto.class));
     }
 }
