@@ -36,7 +36,7 @@ public class MessageMappingTest {
         message.setChat(chat);
 
         // when
-        MessageOutputDto dto = modelMapper.map(message, MessageOutputDto.class);
+        MessageResponseDto dto = modelMapper.map(message, MessageResponseDto.class);
 
         // then
         Assertions.assertEquals(dto.getMessage(), message.getMessage());

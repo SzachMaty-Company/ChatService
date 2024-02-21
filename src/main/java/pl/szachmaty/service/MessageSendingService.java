@@ -1,9 +1,9 @@
 package pl.szachmaty.service;
 
-import pl.szachmaty.model.dto.MessageInputDto;
+import pl.szachmaty.model.dto.MessageRequestDto;
 
 public interface MessageSendingService {
 
-    void sendMessage(MessageInputDto messageInputDto, Long chatId, Long senderId);
+    void sendMessage(MessageRequestDto messageRequestDto, Long chatId, Long senderId);
 
 }

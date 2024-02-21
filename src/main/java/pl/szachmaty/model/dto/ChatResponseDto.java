@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class ChatOutputDto {
+public class ChatResponseDto {
 
     private Long id;
     private Set<Long> chatMembers;
 
-    public static ChatOutputDto convert(Chat chat) {
-        var dto = new ChatOutputDto();
+    public static ChatResponseDto convert(Chat chat) {
+        var dto = new ChatResponseDto();
         dto.setId(chat.getId());
         dto.setChatMembers(chat.getChatMembers().stream().map(User::getId).collect(Collectors.toSet()));
 

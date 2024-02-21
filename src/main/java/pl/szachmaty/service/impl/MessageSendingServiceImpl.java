@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import pl.szachmaty.model.dto.MessageInputDto;
-import pl.szachmaty.model.dto.MessageOutputDto;
+import pl.szachmaty.model.dto.MessageRequestDto;
+import pl.szachmaty.model.dto.MessageResponseDto;
 import pl.szachmaty.model.entity.Message;
 import pl.szachmaty.model.repository.ChatRepository;
 import pl.szachmaty.model.repository.MessageRepository;
@@ -23,14 +23,14 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     private final ModelMapper modelMapper;
 
     @Override
-    public void sendMessage(MessageInputDto messageInputDto, Long chatId, Long senderId) {
+    public void sendMessage(MessageRequestDto messageRequestDto, Long chatId, Long senderId) {
         var message = new Message();
-        message.setMessage(messageInputDto.getMessage());
+        message.setMessage(messageRequestDto.getMessage());
         message.setSender(userRepository.getReferenceById(senderId));
         message.setChat(chatRepository.getReferenceById(chatId));
 
         var savedMessage = messageRepository.save(message);
-        var messageDto = modelMapper.map(savedMessage, MessageOutputDto.class);
+        var messageDto = modelMapper.map(savedMessage, MessageResponseDto.class);
 
         var chat = chatRepository.findChatFetchMembers(chatId).orElseThrow();
         var members = chat.getChatMembers();

@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ChatCreationInputDto {
+public class ChatCreationRequestDto {
 
     private Set<Long> chatMembersIds;
 

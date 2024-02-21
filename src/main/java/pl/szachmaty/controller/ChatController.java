@@ -9,16 +9,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.*;
 import pl.szachmaty.model.Message;
-import pl.szachmaty.model.dto.ChatCreationInputDto;
-import pl.szachmaty.model.dto.ChatCreationOutputDto;
-import pl.szachmaty.model.dto.ChatOutputDto;
-import pl.szachmaty.model.dto.MessageInputDto;
-import pl.szachmaty.model.entity.Chat;
+import pl.szachmaty.model.dto.ChatCreationRequestDto;
+import pl.szachmaty.model.dto.ChatCreationResponseDto;
+import pl.szachmaty.model.dto.ChatResponseDto;
+import pl.szachmaty.model.dto.MessageRequestDto;
 import pl.szachmaty.service.ChatCreationService;
 import pl.szachmaty.service.ChatListService;
 import pl.szachmaty.service.MessageSendingService;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -35,28 +32,28 @@ public class ChatController {
     }
 
     @GetMapping(path = "/user/{userId}/chats")
-    ResponseEntity<Slice<ChatOutputDto>> getChatsForUser(@PathVariable Long userId,
-                                                         Pageable pageable) {
+    ResponseEntity<Slice<ChatResponseDto>> getChatsForUser(@PathVariable Long userId,
+                                                           Pageable pageable) {
         var chats = chatListService.getUserChats(userId, pageable);
-        var chatsDto = chats.map(ChatOutputDto::convert);
+        var chatsDto = chats.map(ChatResponseDto::convert);
 
         return ResponseEntity.ok(chatsDto);
     }
 
     @Profile({"dev", "local"})
     @PostMapping(path = "/chat/{chatId}/sender/{senderId}")
-    ResponseEntity<Void> sendMessageInChat(@RequestBody MessageInputDto messageInputDto,
+    ResponseEntity<Void> sendMessageInChat(@RequestBody MessageRequestDto messageRequestDto,
                                            @PathVariable Long chatId,
                                            @PathVariable Long senderId) {
-        messageSendingService.sendMessage(messageInputDto, chatId, senderId);
+        messageSendingService.sendMessage(messageRequestDto, chatId, senderId);
         return ResponseEntity.noContent().build();
     }
 
     @Profile({"dev", "local"})
     @PostMapping(path = "/chat")
-    ResponseEntity<ChatCreationOutputDto> createChat(@RequestBody ChatCreationInputDto chatCreationInputDto) {
-        var chatId = chatCreationService.createChat(chatCreationInputDto.getChatMembersIds());
-        var chatCreationOutputDto = new ChatCreationOutputDto();
+    ResponseEntity<ChatCreationResponseDto> createChat(@RequestBody ChatCreationRequestDto chatCreationRequestDto) {
+        var chatId = chatCreationService.createChat(chatCreationRequestDto.getChatMembersIds());
+        var chatCreationOutputDto = new ChatCreationResponseDto();
         chatCreationOutputDto.setChatId(chatId);
 
         return ResponseEntity.ok(chatCreationOutputDto);
