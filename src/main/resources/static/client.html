@@ -35,37 +35,54 @@
         async function connect() {
             client = new StompJs.Client({
                 brokerURL: "ws://localhost:8124/registerws",
-                debug: debugCallback
+                debug: debugCallback,
+                connectHeaders: {
+                    token: document.getElementById("jwt").value
+                }
             })
 
-            const userId = document.getElementById("user-id").value;
-            const chatId = document.getElementById("chat-id").value;
+            // const userId = document.getElementById("user-id").value;
+            // const chatId = document.getElementById("chat-id").value;
 
-            client.onConnect = function (frame) {
-                const url = `/user/${userId}/messages`
-                subscription = client.subscribe(url, callback);
-                console.log({ subscription })
-                console.log("subscribed to", url);
-            }
+            // client.onConnect = function (frame) {
+            //     const url = `/user/${userId}/messages`
+            //     subscription = client.subscribe(url, callback);
+            //     console.log({ subscription })
+            //     console.log("subscribed to", url);
+            // }
             console.log("client activated");
             client.activate();
-            console.log("client connected");
 
-            let response;
-            try {
-                response = await fetch(`http://localhost:8124/chat/${chatId}/messages`, {
-                    method: "GET"
-                });
-                const data = await response.json();
-                messages = data.content;
-                // console.log(data.content[0])
-                // .map(m => m.message)
-                displayMessages(messages)
-            } catch (e) {
-                console.error(e);
-            } finally {
-                console.log("messages fetched with status:", response.status);
-            }
+            // console.log("client connected");
+
+            // let response;
+            // try {
+            //     response = await fetch(`http://localhost:8124/chat/${chatId}/messages`, {
+            //         method: "GET"
+            //     });
+            //     const data = await response.json();
+            //     messages = data.content;
+            //     // console.log(data.content[0])
+            //     // .map(m => m.message)
+            //     displayMessages(messages)
+            // } catch (e) {
+            //     console.error(e);
+            // } finally {
+            //     console.log("messages fetched with status:", response.status);
+            // }
+        }
+
+        function auth() {
+            const jwt = document.getElementById("jwt").value
+            let credentials = { jwt };
+
+            let results = client.publish({
+                destination: "/chat/authentication",
+                body: JSON.stringify(credentials),
+                headers: { "Content-Type:": "application/json" }
+            });
+
+            console.log("results: ", results);
         }
 
         function disconnect() {
@@ -123,17 +140,23 @@
 <div class="wrapper">
     <div>
         <div class="connection-wrapper">
-            <label for="chat-id">
-                chat id
-                <input type="text" id="chat-id" placeholder="chat id..."/>
-            </label>
-            <label for="user-id">
-                user id
-                <input type="text" id="user-id" placeholder="user id..."/>
+<!--            <label for="chat-id">-->
+<!--                chat id-->
+<!--                <input type="text" id="chat-id" placeholder="chat id..."/>-->
+<!--            </label>-->
+<!--            <label for="user-id">-->
+<!--                user id-->
+<!--                <input type="text" id="user-id" placeholder="user id..."/>-->
+<!--            </label>-->
+
+            <label>
+                jwt
+                <input type="text" id="jwt" placeholder="jwt..."/>
             </label>
         </div>
         <button id="connect_btn" onclick="connect()">Connect</button>
         <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
+        <button id="" onclick="auth()">Auth</button>
     </div>
 
     <!--    <button id="sub_btn" onclick="subscribe()">Subscribe</button>-->
@@ -141,12 +164,12 @@
 <!--        <input type="text" id="from" placeholder="Choose a nickname"/>-->
 <!--    </div>-->
 
-    <button onclick="displayMessages([])">test messages</button>
-    <label>
-        message
-        <input type="text" id="message-input" placeholder="message..."/>
-        <button id="send_btn" onclick="sendMessage()">Send</button>
-    </label>
+<!--    <button onclick="displayMessages([])">test messages</button>-->
+<!--    <label>-->
+<!--        message-->
+<!--        <input type="text" id="message-input" placeholder="message..."/>-->
+<!--        <button id="send_btn" onclick="sendMessage()">Send</button>-->
+<!--    </label>-->
 
 
 <!--    <button id="test_cors" onclick="testCors()">Click to test cors</button>-->

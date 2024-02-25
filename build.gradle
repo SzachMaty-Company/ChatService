@@ -26,6 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '6.1.5'
     implementation 'org.modelmapper:modelmapper:3.0.0'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.38-rc3'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
