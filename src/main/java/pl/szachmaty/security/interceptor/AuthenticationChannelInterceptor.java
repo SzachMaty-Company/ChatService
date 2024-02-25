@@ -1,4 +1,4 @@
-package pl.szachmaty.security;
+package pl.szachmaty.security.interceptor;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.UserRepository;
 import pl.szachmaty.model.value.GlobalUserId;
+import pl.szachmaty.security.UserAuthenticationToken;
 
 import java.text.ParseException;
 import java.util.List;

@@ -30,4 +30,9 @@ public class User {
     )
     private Set<Chat> chats;
 
+    @Override
+    public String toString() {
+        return globalUserId.getId();
+    }
+
 }
