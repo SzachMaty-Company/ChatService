@@ -58,7 +58,7 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
             throw new MessagingException(e.getMessage());
         }
 
-        User principal = userRepository.findUserByGlobalUserId(userId);
+        User principal = userRepository.findUserByUserId(userId);
         if (principal == null) {
             principal = userRepository.save(
                     User.builder()

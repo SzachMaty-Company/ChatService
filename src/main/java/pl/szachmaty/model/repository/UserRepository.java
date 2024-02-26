@@ -6,7 +6,7 @@ import pl.szachmaty.model.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u FROM User u WHERE u.globalUserId.id = :id")
-    User findUserByGlobalUserId(String id);
+    @Query("SELECT u FROM User u WHERE u.userId.id = :id")
+    User findUserByUserId(String id);
 
 }
