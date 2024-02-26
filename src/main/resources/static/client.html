@@ -10,6 +10,11 @@
         let client = null;
         let subscription = null;
         let messages = [];
+        // hardcoded for tests
+        let users = {
+            "tomisław": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Imdsb2JhbC1pZC0xIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6InRvbWlzxYJhdyBhcG9sb25pdXN6IGN1cnXFm8KgYmFjaGxlZGEgZmFyZWwifQ.L6P1NP5oS5L2L1ygKyxBl5YHc2ThddUzv1FEzaUFamI",
+            "yeti": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Imdsb2JhbC1pZC0yIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6InlldGkifQ.0bcugeUMqEilB0j4BhgSm6AMhtRzINbvN1yQzPfNIog",
+        };
 
         function displayMessages(messages) {
             let ul = [];
@@ -23,66 +28,35 @@
                 .replaceChildren(...ul);
         }
 
-        function callback(message) {
-            messages.push(JSON.parse(message.body));
-            displayMessages(messages);
-        }
-
         function debugCallback(str) {
             console.debug(str)
         }
 
-        async function connect() {
+        function callback(message) {
+            // messages.push(JSON.parse(message.body));
+            // displayMessages(messages);
+            console.log(JSON.parse(message.body))
+        }
+
+        async function connect(user) {
             client = new StompJs.Client({
                 brokerURL: "ws://localhost:8124/registerws",
                 debug: debugCallback,
                 connectHeaders: {
-                    token: document.getElementById("jwt").value
+                    token: users[user]
                 }
             })
 
-            // const userId = document.getElementById("user-id").value;
-            // const chatId = document.getElementById("chat-id").value;
+            client.onConnect = function (frame) {
+                subscription = client.subscribe("/user/queue/messages", callback, {
+                    token: users[user]
+                });
+                console.log({ subscription })
+                console.log("subscribed!")
+            }
 
-            // client.onConnect = function (frame) {
-            //     const url = `/user/${userId}/messages`
-            //     subscription = client.subscribe(url, callback);
-            //     console.log({ subscription })
-            //     console.log("subscribed to", url);
-            // }
             console.log("client activated");
             client.activate();
-
-            // console.log("client connected");
-
-            // let response;
-            // try {
-            //     response = await fetch(`http://localhost:8124/chat/${chatId}/messages`, {
-            //         method: "GET"
-            //     });
-            //     const data = await response.json();
-            //     messages = data.content;
-            //     // console.log(data.content[0])
-            //     // .map(m => m.message)
-            //     displayMessages(messages)
-            // } catch (e) {
-            //     console.error(e);
-            // } finally {
-            //     console.log("messages fetched with status:", response.status);
-            // }
-        }
-
-        function auth() {
-            const jwt = document.getElementById("jwt").value
-            let credentials = { jwt };
-
-            let results = client.publish({
-                destination: "/chat/authentication",
-                body: JSON.stringify(credentials),
-                headers: { "Content-Type:": "application/json" }
-            });
-
-            console.log("results: ", results);
         }
 
         function disconnect() {
@@ -90,48 +64,17 @@
                 console.log("client deactivated")
                 client.deactivate();
             }
-
-            if (subscription) {
-                console.log("unsubscribing")
-                subscription.unsubscribe();
-            }
         }
 
         async function sendMessage() {
-            const chatId = document.getElementById("chat-id").value;
-            const userId = document.getElementById("user-id").value;
-
-            const message = document.getElementById("message-input").value;
-            let response;
-
-            try {
-                response = await fetch(`http://localhost:8124/chat/${chatId}/sender/${userId}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({message})
-                })
-
-            } catch (e) {
-                console.error(e);
-            } finally {
-                console.log("message send status:", response.status)
-            }
-        }
-
-        async function testCors() {
-            try {
-                const response = await fetch("http://localhost:8124/test", {
-                    method: "GET",
-                })
-
-                console.log(response)
-                const json = await response.json();
-                console.log(json);
-            } catch (e) {
-                console.log(e);
-            }
+            client.publish({
+                destination: "/chat/message",
+                body: JSON.stringify({
+                    chatId: 1,
+                    message: "Hello"
+                }),
+                headers: { "Content-Type:": "application/json" }
+            })
         }
     </script>
 </head>
@@ -139,24 +82,10 @@
 
 <div class="wrapper">
     <div>
-        <div class="connection-wrapper">
-<!--            <label for="chat-id">-->
-<!--                chat id-->
-<!--                <input type="text" id="chat-id" placeholder="chat id..."/>-->
-<!--            </label>-->
-<!--            <label for="user-id">-->
-<!--                user id-->
-<!--                <input type="text" id="user-id" placeholder="user id..."/>-->
-<!--            </label>-->
-
-            <label>
-                jwt
-                <input type="text" id="jwt" placeholder="jwt..."/>
-            </label>
-        </div>
-        <button id="connect_btn" onclick="connect()">Connect</button>
+        <button id="tomisław-connect_btn" onclick="connect('tomisław')">Połącz jako Tomisław</button>
+        <button id="yeti-connect_btn" onclick="connect('yeti')">Połącz jako Yeti</button>
         <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
-        <button id="" onclick="auth()">Auth</button>
+        <button id="send-message_btn" onclick="sendMessage()">Send Message</button>
     </div>
 
     <!--    <button id="sub_btn" onclick="subscribe()">Subscribe</button>-->

@@ -2,7 +2,7 @@ package pl.szachmaty.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import pl.szachmaty.model.value.GlobalUserId;
+import pl.szachmaty.model.value.UserId;
 
 import java.util.Set;
 
@@ -18,7 +18,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private GlobalUserId globalUserId;
+    private UserId userId;
     private String username;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -32,7 +32,7 @@ public class User {
 
     @Override
     public String toString() {
-        return globalUserId.getId();
+        return userId.getId();
     }
 
 }

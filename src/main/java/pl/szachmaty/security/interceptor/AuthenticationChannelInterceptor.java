@@ -12,7 +12,7 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.UserRepository;
-import pl.szachmaty.model.value.GlobalUserId;
+import pl.szachmaty.model.value.UserId;
 import pl.szachmaty.security.UserAuthenticationToken;
 
 import java.text.ParseException;
@@ -46,23 +46,23 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
             throw new MessagingException("Multiple token headers found, don't know which one to choose");
         }
 
-        String globalUserId = null;
+        String userId = null;
         String username = null;
         try {
             // TODO add signature validation
             JWT jwt = JWTParser.parse(nativeToken.get(0));
 
-            globalUserId = (String) jwt.getJWTClaimsSet().getClaim(USER_ID_CLAIM);
+            userId = (String) jwt.getJWTClaimsSet().getClaim(USER_ID_CLAIM);
             username = (String) jwt.getJWTClaimsSet().getClaim(USERNAME_CLAIM);
         } catch (ParseException e) {
             throw new MessagingException(e.getMessage());
         }
 
-        User principal = userRepository.findUserByGlobalUserId(globalUserId);
+        User principal = userRepository.findUserByGlobalUserId(userId);
         if (principal == null) {
             principal = userRepository.save(
                     User.builder()
-                            .globalUserId(GlobalUserId.withId(globalUserId))
+                            .userId(new UserId(userId))
                             .username(username)
                             .build()
             );

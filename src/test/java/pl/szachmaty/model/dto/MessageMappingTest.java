@@ -37,7 +37,7 @@ public class MessageMappingTest {
         message.setChat(chat);
 
         // when
-        MessageResponseDto dto = modelMapper.map(message, MessageResponseDto.class);
+        ChatMessageDto dto = modelMapper.map(message, ChatMessageDto.class);
 
         // then
         Assertions.assertEquals(dto.getMessage(), message.getMessage());
@@ -60,7 +60,7 @@ public class MessageMappingTest {
         chat.setChatMembers(Set.of(user1, user2));
 
         // when
-        ChatResponseDto dto = modelMapper.map(chat, ChatResponseDto.class);
+        ChatListItemDto dto = modelMapper.map(chat, ChatListItemDto.class);
 
         // then
         Assertions.assertEquals(chat.getId(), dto.getId());

@@ -3,13 +3,15 @@ package pl.szachmaty.service.impl;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import pl.szachmaty.model.dto.MessageRequestDto;
-import pl.szachmaty.model.dto.MessageResponseDto;
-import pl.szachmaty.model.entity.Message;
+import pl.szachmaty.model.dto.Message;
+import pl.szachmaty.model.dto.ChatMessageDto;
+import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.ChatRepository;
 import pl.szachmaty.model.repository.MessageRepository;
 import pl.szachmaty.model.repository.UserRepository;
+import pl.szachmaty.security.ChatParticipantValidator;
 import pl.szachmaty.service.MessageSendingService;
 
 @Service
@@ -21,22 +23,30 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatRepository chatRepository;
     private final ModelMapper modelMapper;
+    private final ChatParticipantValidator chatParticipantValidator;
 
     @Override
-    public void sendMessage(MessageRequestDto messageRequestDto, Long chatId, Long senderId) {
-        var message = new Message();
-        message.setMessage(messageRequestDto.getMessage());
-        message.setSender(userRepository.getReferenceById(senderId));
-        message.setChat(chatRepository.getReferenceById(chatId));
+    public void sendMessage(Message inboundMessage, User user) {
+        boolean canSentMessageToChat = chatParticipantValidator.isUserChatParticipant(user, inboundMessage.getChatId());
+        if (!canSentMessageToChat) {
+            throw new AccessDeniedException("user is not participant of this chat, cannot send message");
+        }
 
-        var savedMessage = messageRepository.save(message);
-        var messageDto = modelMapper.map(savedMessage, MessageResponseDto.class);
+        var message = pl.szachmaty.model.entity.Message.builder()
+                .message(inboundMessage.getMessage())
+                .chat(chatRepository.getReferenceById(inboundMessage.getChatId()))
+                .sender(userRepository.getReferenceById(user.getId()))
+                .build();
 
-        var chat = chatRepository.findChatFetchMembers(chatId).orElseThrow();
+//        var savedMessage = messageRepository.save(message);
+//        var messageDto = modelMapper.map(savedMessage, MessageResponseDto.class);
+        var messageDto = modelMapper.map(message, ChatMessageDto.class);
+
+        var chat = chatRepository.findChatFetchMembers(inboundMessage.getChatId()).orElseThrow();
         var members = chat.getChatMembers();
 
         for (var member : members) {
-            simpMessagingTemplate.convertAndSendToUser(String.valueOf(member.getId()), "/messages", messageDto);
+            simpMessagingTemplate.convertAndSendToUser(member.getUserId().getId(), "/queue/messages", messageDto);
         }
     }
 }
