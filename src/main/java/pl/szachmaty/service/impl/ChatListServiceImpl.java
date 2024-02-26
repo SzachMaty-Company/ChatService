@@ -19,4 +19,5 @@ public class ChatListServiceImpl implements ChatListService {
     public Slice<Chat> getUserChats(String userId, Pageable pageable) {
         return chatRepository.findUserChats(userId, pageable);
     }
+
 }

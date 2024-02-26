@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class ChatMessageDto {
 
     private Long chatId;
-    private Long senderId;
+    private String senderId;
     private LocalDateTime timestamp;
     private String message;
 

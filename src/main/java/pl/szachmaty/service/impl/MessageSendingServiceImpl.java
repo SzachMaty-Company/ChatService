@@ -1,5 +1,6 @@
 package pl.szachmaty.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,6 +27,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     private final ChatParticipantValidator chatParticipantValidator;
 
     @Override
+    @Transactional
     public void sendMessage(Message inboundMessage, User user) {
         boolean canSentMessageToChat = chatParticipantValidator.isUserChatParticipant(user, inboundMessage.getChatId());
         if (!canSentMessageToChat) {
@@ -38,7 +40,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
                 .sender(userRepository.getReferenceById(user.getId()))
                 .build();
 
-//        var savedMessage = messageRepository.save(message);
+        var savedMessage = messageRepository.save(message);
 //        var messageDto = modelMapper.map(savedMessage, MessageResponseDto.class);
         var messageDto = modelMapper.map(message, ChatMessageDto.class);
 
