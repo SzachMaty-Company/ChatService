@@ -8,21 +8,16 @@ import lombok.Setter;
 @Embeddable
 @Getter
 @Setter
-public class GlobalUserId {
+public class UserId {
 
     @Column(name = "global_user_id")
     private String id;
 
-    public GlobalUserId(String id) {
+    public UserId(String id) {
         this.id = id;
     }
 
-    public GlobalUserId() {
-
-    }
-
-    public static GlobalUserId withId(String id) {
-        return new GlobalUserId(id);
+    public UserId() {
     }
 
 }

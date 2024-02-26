@@ -1,13 +1,13 @@
 package pl.szachmaty.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -16,6 +16,7 @@ import pl.szachmaty.security.interceptor.AuthenticationChannelInterceptor;
 import pl.szachmaty.security.interceptor.MaxSessionChannelInterceptor;
 
 @Configuration
+@EnableWebSecurity
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
@@ -38,12 +39,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-//        config.setApplicationDestinationPrefixes("/app", "/user");
-        config.setApplicationDestinationPrefixes("/app", "/chat");
-//        config.enableSimpleBroker("/topic");
-//        config.enableSimpleBroker("/user");
-//        config.enableSimpleBroker("/user/**/messages");
-//        config.setUserDestinationPrefix("/user");
+        config.setApplicationDestinationPrefixes("/chat");
+        config.enableSimpleBroker("/user");
+        config.enableSimpleBroker("/queue");
     }
 
     @Override

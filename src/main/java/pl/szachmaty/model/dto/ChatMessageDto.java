@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class MessageResponseDto {
+public class ChatMessageDto {
 
     private Long chatId;
     private Long senderId;

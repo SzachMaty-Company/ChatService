@@ -1,9 +1,10 @@
 package pl.szachmaty.service;
 
-import java.util.Set;
+import pl.szachmaty.model.dto.ChatCreationRequest;
+import pl.szachmaty.model.entity.Chat;
 
 public interface ChatCreationService {
 
-    Long createChat(Set<Long> chatMembersIds);
+    Chat createChat(ChatCreationRequest dto);
 
 }

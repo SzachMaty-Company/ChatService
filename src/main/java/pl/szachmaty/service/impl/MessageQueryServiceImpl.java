@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import pl.szachmaty.model.dto.MessageResponseDto;
+import pl.szachmaty.model.dto.ChatMessageDto;
 import pl.szachmaty.model.repository.MessageRepository;
 import pl.szachmaty.service.MessageQueryService;
 
@@ -16,9 +16,10 @@ public class MessageQueryServiceImpl implements MessageQueryService {
     private final MessageRepository messageRepository;
     private final ModelMapper modelMapper;
 
+    // TODO: require authorization
     @Override
-    public Slice<MessageResponseDto> findMessages(Long chatId, Pageable pageable) {
+    public Slice<ChatMessageDto> queryMessages(Long chatId, Pageable pageable) {
         return messageRepository.findMessagesByChatIdOrderByTimestamp(chatId, pageable)
-                .map(m -> modelMapper.map(m, MessageResponseDto.class));
+                .map(m -> modelMapper.map(m, ChatMessageDto.class));
     }
 }
