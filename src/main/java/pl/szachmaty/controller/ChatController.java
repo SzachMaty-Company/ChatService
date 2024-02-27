@@ -7,11 +7,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
-import pl.szachmaty.model.dto.ChatCreationRequest;
-import pl.szachmaty.model.dto.ChatCreationResponse;
-import pl.szachmaty.model.dto.ChatListItemDto;
-import pl.szachmaty.model.dto.Message;
+import pl.szachmaty.model.dto.*;
 import pl.szachmaty.model.entity.User;
+import pl.szachmaty.model.repository.ChatRepository;
 import pl.szachmaty.security.UserAuthenticationToken;
 import pl.szachmaty.service.ChatCreationService;
 import pl.szachmaty.service.ChatListService;
@@ -27,15 +25,12 @@ public class ChatController {
     final ChatListService chatListService;
     final ChatCreationService chatCreationService;
     final MessageSendingService messageSendingService;
+    final ChatRepository chatRepository;
 
-    // TODO: require authorization
-    @GetMapping(path = "/user/{userId}/chats")
-    ResponseEntity<Slice<ChatListItemDto>> getChatListForUser(@PathVariable String userId,
-                                                              Pageable pageable) {
-        var chats = chatListService.getUserChats(userId, pageable);
-        var chatsDto = chats.map(ChatListItemDto::convert);
-
-        return ResponseEntity.ok(chatsDto);
+    @GetMapping(path = "/user/chats")
+    ResponseEntity<Slice<ChatListItem>> getChatListForUser(Principal principal, Pageable pageable) {
+        User user = (User) ((UserAuthenticationToken) principal).getPrincipal();
+        return ResponseEntity.ok(chatListService.getUserChats(user.getUserId().getId(), pageable));
     }
 
     @Profile({"dev", "local"})

@@ -6,8 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import pl.szachmaty.model.dto.Message;
 import pl.szachmaty.model.dto.ChatMessageDto;
+import pl.szachmaty.model.dto.Message;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.ChatRepository;
 import pl.szachmaty.model.repository.MessageRepository;
@@ -28,27 +28,27 @@ public class MessageSendingServiceImpl implements MessageSendingService {
 
     @Override
     @Transactional
-    public void sendMessage(Message inboundMessage, User user) {
-        boolean canSentMessageToChat = chatParticipantValidator.isUserChatParticipant(user, inboundMessage.getChatId());
-        if (!canSentMessageToChat) {
-            throw new AccessDeniedException("user is not participant of this chat, cannot send message");
+    public void sendMessage(Message messageToSend, User sender) {
+        boolean canSentMessageInChat = chatParticipantValidator.isUserChatMember(sender, messageToSend.getChatId());
+        if (!canSentMessageInChat) {
+            throw new AccessDeniedException("User is not member of this chat, cannot send message");
         }
 
         var message = pl.szachmaty.model.entity.Message.builder()
-                .message(inboundMessage.getMessage())
-                .chat(chatRepository.getReferenceById(inboundMessage.getChatId()))
-                .sender(userRepository.getReferenceById(user.getId()))
+                .message(messageToSend.getMessage())
+                .chat(chatRepository.getReferenceById(messageToSend.getChatId()))
+                .sender(userRepository.getReferenceById(sender.getId()))
                 .build();
 
         var savedMessage = messageRepository.save(message);
-//        var messageDto = modelMapper.map(savedMessage, MessageResponseDto.class);
-        var messageDto = modelMapper.map(message, ChatMessageDto.class);
+        var messageDto = modelMapper.map(savedMessage, ChatMessageDto.class);
 
-        var chat = chatRepository.findChatFetchMembers(inboundMessage.getChatId()).orElseThrow();
+        var chat = chatRepository.findChatFetchMembers(savedMessage.getChat().getId()).orElseThrow();
         var members = chat.getChatMembers();
 
         for (var member : members) {
             simpMessagingTemplate.convertAndSendToUser(member.getUserId().getId(), "/queue/messages", messageDto);
         }
     }
+
 }

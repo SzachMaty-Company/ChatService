@@ -20,14 +20,14 @@ public class ModelMapperConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public TypeMap<Chat, ChatListItemDto> chatResponseDtoTypeMap() {
-        Converter<Set<User>, Set<Long>> userToUserIdConverter = (users) -> users.getSource().stream().map(User::getId).collect(Collectors.toSet());
-
-        TypeMap<Chat, ChatListItemDto> typeMap = modelMapper().createTypeMap(Chat.class, ChatListItemDto.class);
-        typeMap.addMappings(mapper -> mapper.using(userToUserIdConverter).map(Chat::getChatMembers, ChatListItemDto::setChatMembers));
-
-        return typeMap;
-    }
+//    @Bean
+//    public TypeMap<Chat, ChatListItemDto> chatResponseDtoTypeMap() {
+//        Converter<Set<User>, Set<Long>> userToUserIdConverter = (users) -> users.getSource().stream().map(User::getId).collect(Collectors.toSet());
+//
+//        TypeMap<Chat, ChatListItemDto> typeMap = modelMapper().createTypeMap(Chat.class, ChatListItemDto.class);
+//        typeMap.addMappings(mapper -> mapper.using(userToUserIdConverter).map(Chat::getChatMembers, ChatListItemDto::setChatMembers));
+//
+//        return typeMap;
+//    }
 
 }

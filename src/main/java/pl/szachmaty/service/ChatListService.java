@@ -2,11 +2,10 @@ package pl.szachmaty.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import pl.szachmaty.model.entity.Chat;
-import pl.szachmaty.model.value.UserId;
+import pl.szachmaty.model.dto.ChatListItem;
 
 public interface ChatListService {
 
-    Slice<Chat> getUserChats(String userId, Pageable pageable);
+    Slice<ChatListItem> getUserChats(String userId, Pageable pageable);
 
 }

@@ -15,14 +15,7 @@ import java.util.stream.Collectors;
 public class ChatListItemDto {
 
     private Long id;
-    private Set<Long> chatMembers;
-
-    public static ChatListItemDto convert(Chat chat) {
-        var dto = new ChatListItemDto();
-        dto.setId(chat.getId());
-        dto.setChatMembers(chat.getChatMembers().stream().map(User::getId).collect(Collectors.toSet()));
-
-        return dto;
-    }
+    private Set<ChatMemberDto> chatMembers;
+    private Message lastMessageInChat;
 
 }
