@@ -14,11 +14,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("SELECT ch FROM Chat ch LEFT JOIN FETCH ch.chatMembers WHERE ch.id = :chatId")
     Optional<Chat> findChatFetchMembers(Long chatId);
 
-    @Query("SELECT u.chats FROM User u WHERE u.userId.id = :userId")
-    Slice<Chat> findUserChats(String userId, Pageable pageable);
-
-//    List<?> findUserChatsWithLastMessageInChat(String userId);
-
     @Query(value = """
                 select m.message as message,
                        m.id as messageId,

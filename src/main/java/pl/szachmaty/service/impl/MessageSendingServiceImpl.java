@@ -29,7 +29,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     @Override
     @Transactional
     public void sendMessage(Message messageToSend, User sender) {
-        boolean canSentMessageInChat = chatParticipantValidator.isUserChatMember(sender, messageToSend.getChatId());
+        boolean canSentMessageInChat = chatParticipantValidator.isUserChatParticipant(sender, messageToSend.getChatId());
         if (!canSentMessageInChat) {
             throw new AccessDeniedException("User is not member of this chat, cannot send message");
         }

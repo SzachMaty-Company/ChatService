@@ -22,3 +22,5 @@ insert into chat_service.message (sender_id, chat_id, message) values (3, 2, 'ch
 insert into chat_service.message (sender_id, chat_id, message) values (2, 2, 'chat 2 message 3');
 
 alter table chat_service."user" alter column id restart with 2000;
+alter table chat_service.chat alter column id restart with 2000;
+alter table chat_service."message" alter column id restart with 2000;
