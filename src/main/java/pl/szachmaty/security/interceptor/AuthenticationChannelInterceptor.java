@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.UserRepository;
 import pl.szachmaty.model.value.UserId;
-import pl.szachmaty.security.UserAuthenticationToken;
+import pl.szachmaty.security.UserJwtAuthenticationToken;
 
 import java.text.ParseException;
 import java.util.List;
@@ -68,7 +68,7 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
             );
         }
 
-        Authentication authentication = new UserAuthenticationToken(principal);
+        Authentication authentication = new UserJwtAuthenticationToken(principal);
         authentication.setAuthenticated(true);
         accessor.setUser(authentication);
 

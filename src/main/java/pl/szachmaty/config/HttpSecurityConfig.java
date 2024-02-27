@@ -2,17 +2,20 @@ package pl.szachmaty.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.szachmaty.model.repository.UserRepository;
-import pl.szachmaty.security.filter.JwtFilter;
+import pl.szachmaty.security.CustomPreAuthenticatedAuthenticationProvider;
+import pl.szachmaty.security.filter.UserJwtAuthenticationFilter;
 
 import java.util.List;
 
@@ -37,14 +40,26 @@ public class HttpSecurityConfig {
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers("/registerws").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .build();
     }
 
     @Bean
-    JwtFilter jwtFilter() {
-        return new JwtFilter(userRepository);
+    AuthenticationManager authenticationManager() {
+        return new ProviderManager(preAuthenticatedAuthenticationProvider());
+    }
+
+    @Bean
+    AuthenticationProvider preAuthenticatedAuthenticationProvider() {
+        return new CustomPreAuthenticatedAuthenticationProvider(userRepository);
+    }
+
+    @Bean
+    UserJwtAuthenticationFilter jwtFilter() {
+        var filter = new UserJwtAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManager());
+        return filter;
     }
 
     @Bean
