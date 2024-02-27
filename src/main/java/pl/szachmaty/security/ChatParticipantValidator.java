@@ -13,7 +13,7 @@ public class ChatParticipantValidator {
         this.chatRepository = chatRepository;
     }
 
-    public boolean isUserChatParticipant(User user, Long chatId) {
+    public boolean isUserChatMember(User user, Long chatId) {
         return chatRepository.existsChatWithUser(user.getId(), chatId);
     }
 

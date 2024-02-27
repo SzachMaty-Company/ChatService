@@ -66,8 +66,6 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
                             .username(username)
                             .build()
             );
-
-            System.out.println(principal);
         }
 
         Authentication authentication = new UserAuthenticationToken(principal);
