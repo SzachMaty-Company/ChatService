@@ -6,10 +6,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import pl.szachmaty.model.entity.User;
+import pl.szachmaty.model.value.UserId;
 
 import static org.assertj.core.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
@@ -21,8 +22,8 @@ class UserRepositoryTest {
     void givenUser_whenPersist_thenSuccess() {
         // given
         var user = User.builder()
-                .name("bob")
-                .surname("bob")
+                .username("bob")
+                .userId(new UserId("1000"))
                 .build();
 
         // when
@@ -32,8 +33,7 @@ class UserRepositoryTest {
         var fetchedUser = userRepository.findById(savedUser.getId())
                 .orElseThrow();
         assertThat(fetchedUser).isNotNull();
-        assertThat(fetchedUser.getName()).isEqualTo("bob");
-        assertThat(fetchedUser.getSurname()).isEqualTo("bob");
+        assertThat(fetchedUser.getUsername()).isEqualTo("bob");
     }
 
 }
