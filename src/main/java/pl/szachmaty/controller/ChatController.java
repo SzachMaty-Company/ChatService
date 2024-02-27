@@ -6,11 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.szachmaty.model.dto.*;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.ChatRepository;
-import pl.szachmaty.security.UserAuthenticationToken;
+import pl.szachmaty.security.UserJwtAuthenticationToken;
 import pl.szachmaty.service.ChatCreationService;
 import pl.szachmaty.service.ChatListService;
 import pl.szachmaty.service.MessageSendingService;
@@ -28,15 +29,15 @@ public class ChatController {
     final ChatRepository chatRepository;
 
     @GetMapping(path = "/user/chats")
-    ResponseEntity<Slice<ChatListItem>> getChatListForUser(Principal principal, Pageable pageable) {
-        User user = (User) ((UserAuthenticationToken) principal).getPrincipal();
+    ResponseEntity<Slice<ChatListItem>> getChatListForUser(Authentication authentication, Pageable pageable) {
+        User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(chatListService.getUserChats(user.getUserId().getId(), pageable));
     }
 
     @Profile({"dev", "local"})
     @MessageMapping("/message")
-    void sendMessageInChat(Message message, Principal principal) {
-        User user = (User) ((UserAuthenticationToken) principal).getPrincipal();
+    void sendMessageInChat(Message message, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
         messageSendingService.sendMessage(message, user);
     }
 
