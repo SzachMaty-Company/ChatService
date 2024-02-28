@@ -9,7 +9,12 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.UserRepository;
 import pl.szachmaty.model.value.UserId;
@@ -23,10 +28,10 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
     private static final String TOKEN_HEADER = "token";
     private static final String USER_ID_CLAIM = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
     private static final String USERNAME_CLAIM = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
-    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthenticationChannelInterceptor(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthenticationChannelInterceptor(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -36,41 +41,24 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
             return message;
         }
 
-        List<String> nativeToken = accessor.getNativeHeader(TOKEN_HEADER);
+        String nativeToken = accessor.getFirstNativeHeader(TOKEN_HEADER);
 
         if (nativeToken == null) {
             throw new MessagingException("Missing authentication token header");
         }
 
-        if (nativeToken.size() != 1) {
-            throw new MessagingException("Multiple token headers found, don't know which one to choose");
-        }
+        String rawToken = nativeToken.replace("Bearer ", "");
+        Authentication token = new PreAuthenticatedAuthenticationToken(rawToken, "N/A");
+        Authentication authenticated = authenticationManager.authenticate(token);
 
-        String userId = null;
-        String username = null;
-        try {
-            // TODO add signature validation
-            JWT jwt = JWTParser.parse(nativeToken.get(0));
+//        won't work because SecurityContextHolder uses threadlocal and websockets are async
 
-            userId = (String) jwt.getJWTClaimsSet().getClaim(USER_ID_CLAIM);
-            username = (String) jwt.getJWTClaimsSet().getClaim(USERNAME_CLAIM);
-        } catch (ParseException e) {
-            throw new MessagingException(e.getMessage());
-        }
+//        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+//        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+//        context.setAuthentication(authenticated);
+//        securityContextHolderStrategy.setContext(context);
 
-        User principal = userRepository.findUserByUserId(userId);
-        if (principal == null) {
-            principal = userRepository.save(
-                    User.builder()
-                            .userId(new UserId(userId))
-                            .username(username)
-                            .build()
-            );
-        }
-
-        Authentication authentication = new UserJwtAuthenticationToken(principal);
-        authentication.setAuthenticated(true);
-        accessor.setUser(authentication);
+        accessor.setUser(authenticated);
 
         return message;
     }
