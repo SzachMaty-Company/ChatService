@@ -14,7 +14,7 @@ public class ChatParticipantValidator {
     }
 
     public boolean isUserChatMember(User user, Long chatId) {
-        return chatRepository.existsChatWithUser(user.getId(), chatId);
+        return user != null && chatRepository.existsChatWithUser(user.getId(), chatId);
     }
 
 }
