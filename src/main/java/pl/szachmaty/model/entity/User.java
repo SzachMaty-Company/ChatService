@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import pl.szachmaty.model.value.UserId;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -32,7 +33,7 @@ public class User {
 
     @Override
     public String toString() {
-        return userId.getId();
+        return userId == null ? "Null Id" : userId.getId();
     }
 
 }

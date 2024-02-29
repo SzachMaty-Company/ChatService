@@ -5,6 +5,8 @@ services:
       - 8124:8124
     depends_on:
       - chatservice-db
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
     networks:
       - chat-service-network
 

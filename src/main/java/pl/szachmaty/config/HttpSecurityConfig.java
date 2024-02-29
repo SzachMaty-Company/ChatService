@@ -1,10 +1,13 @@
 package pl.szachmaty.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,9 +23,11 @@ import pl.szachmaty.security.filter.UserJwtAuthenticationFilter;
 import java.util.List;
 
 @EnableWebSecurity(debug = true)
+@EnableMethodSecurity
 @Configuration
 public class HttpSecurityConfig {
 
+    @Autowired
     final UserRepository userRepository;
 
     public HttpSecurityConfig(UserRepository userRepository) {
@@ -32,6 +37,7 @@ public class HttpSecurityConfig {
     @Bean
     SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
         return http
+//                .securityMatcher("/registerws", "/chat/**", "/user/**")
                 .cors(x -> x.disable())
                 .csrf(x -> x.disable())
                 .httpBasic(x -> x.disable())
@@ -47,11 +53,11 @@ public class HttpSecurityConfig {
 
     @Bean
     AuthenticationManager authenticationManager() {
-        return new ProviderManager(preAuthenticatedAuthenticationProvider());
+        return new ProviderManager(customPreAuthenticatedAuthenticationProvider());
     }
 
     @Bean
-    AuthenticationProvider preAuthenticatedAuthenticationProvider() {
+    AuthenticationProvider customPreAuthenticatedAuthenticationProvider() {
         return new CustomPreAuthenticatedAuthenticationProvider(userRepository);
     }
 
