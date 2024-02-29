@@ -1,8 +1,15 @@
 # create jar
 FROM gradle:8.5.0-jdk17 AS build
-COPY . /app
+
+# install dependencies and cache them
 WORKDIR /app
-RUN gradle bootJar 
+COPY ./build.gradle /app/
+COPY ./settings.gradle /app/
+RUN gradle dependencies
+
+# build jar
+COPY /src /app/src
+RUN gradle bootJar
 
 # run that jar
 FROM openjdk:17-oracle
