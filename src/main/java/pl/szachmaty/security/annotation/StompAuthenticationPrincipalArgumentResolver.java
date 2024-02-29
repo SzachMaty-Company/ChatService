@@ -23,6 +23,10 @@ public class StompAuthenticationPrincipalArgumentResolver implements HandlerMeth
     @Override
     public Object resolveArgument(MethodParameter parameter, Message<?> message) throws Exception {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor == null || accessor.getUser() == null) {
+            return null;
+        }
+
         return ((Authentication) accessor.getUser()).getPrincipal();
     }
 
