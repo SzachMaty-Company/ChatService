@@ -5,6 +5,7 @@ import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.MessagingException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
+import pl.szachmaty.exception.AppMessagingException;
 
 public class CustomStompErrorHandler extends StompSubProtocolErrorHandler {
 
@@ -20,6 +21,11 @@ public class CustomStompErrorHandler extends StompSubProtocolErrorHandler {
                 throwable = badCredentialsException;
             }
         }
+
+        if (ex instanceof AppMessagingException appMessagingException) {
+            throwable = appMessagingException;
+        }
+
         return super.handleClientMessageProcessingError(clientMessage, throwable);
     }
 
