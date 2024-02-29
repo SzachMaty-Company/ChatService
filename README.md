@@ -6,41 +6,42 @@ If you don't have docker installed on your system:
 - On Windows:
 `winget install Docker.DockerDesktop`
 
-### Docker Image Creation For Dev
-`docker build -t docker build -t`
-
 #### Run Docker Image
-`docker compose --file docker-compose.dev.yml up`
+```bash
+# in Infrastruktura directory
+docker compose --file backend-docker-compose.yml up --build chatservice chatservice-db
+```
 
 #### Stop Docker Image
-`docker compose --file docker-compose.dev.yml down`
+```bash
+# in Infrastruktura directory
+docker compose --file backend-docker-compose.yml down
+```
 
 #### API
-- for authentication in stomp, add `token` header with jwt in ==CONNECT== frame
-- http requests will be authenticated by auth gateway
+- for authentication in stomp, add `token` header with jwt in `CONNECT` frame
 ##### WebSockets
 - _ws://localhost:8124/registerws_ - connect to websocket
-- (stomp) _==SUBSCRIBE==_ _/user/queue/message_ - for receiving messages
+- (stomp) `SUBSCRIBE` _/user/queue/message_ - for receiving messages
 payload structure
 ```json
 {
-    chatId: <number>,
-    senderId: <string>,
-    timestamp: <string>,
-    message: <string>
+    "chatId": "<number>",
+    "senderId": "<string>",
+    "timestamp": "<string>",
+    "message": "<string>"
 }
 ```
-- (stomp) _==SEND==_ _/chat/message_ - for sending messages
+- (stomp) `SEND` _/chat/message_ - for sending messages
 ```json
 {
-    chatId: <number>,
-    message: <string>
+    "chatId": "<number>",
+    "message": "<string>"
 }
 ```
 
-##### Http
-- _http://localhost:8124/user/{userId}/chats_ - user chats (will change later)
-- _http://localhost:8124/chat/{chatId}/messages_ - chat messages
+##### Http 
+- _http://localhost:8124/swagger-ui/index.html_ - swagger
 
 #### Tips
 test websocket client can be found in files: /src/main/resources/static/client.html  
