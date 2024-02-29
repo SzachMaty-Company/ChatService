@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,8 +27,6 @@ import java.util.List;
 public class AuthenticationChannelInterceptor implements ChannelInterceptor {
 
     private static final String TOKEN_HEADER = "token";
-    private static final String USER_ID_CLAIM = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-    private static final String USERNAME_CLAIM = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationChannelInterceptor(AuthenticationManager authenticationManager) {
@@ -44,7 +43,7 @@ public class AuthenticationChannelInterceptor implements ChannelInterceptor {
         String nativeToken = accessor.getFirstNativeHeader(TOKEN_HEADER);
 
         if (nativeToken == null) {
-            throw new MessagingException("Missing authentication token header");
+            throw new BadCredentialsException("Missing authentication token header (" + TOKEN_HEADER + ") in JWT");
         }
 
         String rawToken = nativeToken.replace("Bearer ", "");
