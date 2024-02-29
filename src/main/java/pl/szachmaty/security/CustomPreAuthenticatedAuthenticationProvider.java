@@ -45,14 +45,21 @@ public class CustomPreAuthenticatedAuthenticationProvider implements Authenticat
             userId = (String) jwt.getJWTClaimsSet().getClaim(USER_ID_CLAIM);
             username = (String) jwt.getJWTClaimsSet().getClaim(USERNAME_CLAIM);
         } catch (ParseException e) {
-
-            throw new BadCredentialsException("Invalid JWT");
+            throw new BadCredentialsException("Error parsing JWT, check if structure is valid, maybe some part (header|payload|signature) is missing, maybe you pasted incomplete token (missing some chars)?");
         } catch (JOSEException e) {
-            throw new BadCredentialsException(e.getMessage());
+            throw new BadCredentialsException("Invalid JWT");
         }
 
         if (!isSignatureValid) {
-            throw new BadCredentialsException("Invalid JWT signature");
+            throw new BadCredentialsException("JWT signature invalid, check signature with shared key");
+        }
+
+        if (userId == null || userId.isEmpty()) {
+            throw new BadCredentialsException("Missing user id (" + USER_ID_CLAIM + ") in JWT");
+        }
+
+        if (username == null || username.isEmpty()) {
+            throw new BadCredentialsException("Missing username (" + USER_ID_CLAIM + ") in JWT");
         }
 
         User principal = userRepository.findUserByUserId(userId);
