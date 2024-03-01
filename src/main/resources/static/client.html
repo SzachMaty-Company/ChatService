@@ -9,6 +9,7 @@
     <script defer>
         let client = null;
         let subscription = null;
+        let port = 8000;
         let messages = [];
         // hardcoded for tests
         let users = {
@@ -41,7 +42,7 @@
 
         async function connect(user) {
             client = new StompJs.Client({
-                brokerURL: "ws://localhost:8124/registerws",
+                brokerURL: `ws://localhost:${port}/registerws`,
                 debug: debugCallback,
                 connectHeaders: {
                     token: users[user]
