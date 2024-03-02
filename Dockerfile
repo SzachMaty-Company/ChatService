@@ -1,14 +1,18 @@
-#build stage
-FROM gradle:8.4.0-jdk17-alpine AS BUILD_STAGE
+# create jar
+FROM gradle:8.5.0-jdk17 AS build
 
+# install dependencies and cache them
 WORKDIR /app
-COPY . /app
-RUN gradle build
+COPY ./build.gradle /app/
+COPY ./settings.gradle /app/
+RUN gradle dependencies
 
-#package stage
+# build jar
+COPY /src /app/src
+RUN gradle bootJar
+
+# run that jar
 FROM openjdk:17-oracle
-
-WORKDIR /app
-COPY --from=BUILD_STAGE /app/build/libs/ChatService-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8080
-ENTRYPOINT exec java -jar app.jar
+COPY --from=build /app/lib/ChatService.jar /app/ChatService.jar
+EXPOSE 8124
+CMD ["java","-jar", "/app/ChatService.jar"]

@@ -6,18 +6,44 @@ If you don't have docker installed on your system:
 - On Windows:
 `winget install Docker.DockerDesktop`
 
-#### Run a container
-`docker run -p 8124:8080 chat-service`
+#### Run Docker Image
+```bash
+# in Infrastruktura directory
+docker compose --file backend-docker-compose.yml up --build chatservice chatservice-db
+```
 
-#### Test if app is running:
-`curl http://localhost:8124/test`
+#### Stop Docker Image
+```bash
+# in Infrastruktura directory
+docker compose --file backend-docker-compose.yml down
+```
+
 #### API
-- /test -> to test connection
-- /registerws -> to register websocket connection
-- /topic/chat -> to subscribe to channel(for receiving messages)
-- /app/chat -> for sending messages to the channel
+- for authentication in stomp, add `token` header with jwt in `CONNECT` frame
+##### WebSockets
+- _ws://localhost:8124/registerws_ - connect to websocket
+- (stomp) `SUBSCRIBE` _/user/queue/message_ - for receiving messages
+payload structure
+```json
+{
+    "chatId": "<number>",
+    "senderId": "<string>",
+    "timestamp": "<string>",
+    "message": "<string>"
+}
+```
+- (stomp) `SEND` _/chat/message_ - for sending messages
+```json
+{
+    "chatId": "<number>",
+    "message": "<string>"
+}
+```
+
+##### Http 
+- _http://localhost:8124/swagger-ui/index.html_ - swagger
 
 #### Tips
-I also implemeneted small testing client which is static HTML page. if you want to use it you need to move to the /src/main/resources/static/client.html  
+test websocket client can be found in files: /src/main/resources/static/client.html  
 REMEMBER!!! Make sure that you haven't changed HOST port(8124), because this static client uses this port for connection with websockets(ofc you can change it manually in code).  
 

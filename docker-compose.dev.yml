@@ -1,0 +1,29 @@
+services:
+  chat-service:
+    image: szachmaty/chat-service
+    ports:
+      - 8124:8124
+    depends_on:
+      - chatservice-db
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    networks:
+      - chat-service-network
+
+  chatservice-db:
+    image: postgres
+    container_name: chatservice-db
+    environment:
+      POSTGRES_PASSWORD: Password1!
+      POSTGRES_USER: dev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
+    networks:
+      - chat-service-network
+
+networks:
+  chat-service-network:
+    driver: bridge
+
