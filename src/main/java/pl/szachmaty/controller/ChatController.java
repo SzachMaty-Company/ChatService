@@ -24,7 +24,7 @@ import pl.szachmaty.service.ChatListService;
 import pl.szachmaty.service.MessageSendingService;
 
 @RestController
-@CrossOrigin
+//@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
 @AllArgsConstructor
 public class ChatController {
 
