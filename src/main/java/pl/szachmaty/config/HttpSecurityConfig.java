@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -39,7 +40,7 @@ public class HttpSecurityConfig {
     SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
         return http
 //                .securityMatcher("/registerws", "/chat/**", "/user/**")
-                .cors(x -> x.disable())
+                .cors(x -> x.configurationSource(corsConfigurationSource()))
                 .csrf(x -> x.disable())
                 .httpBasic(x -> x.disable())
                 .formLogin(x -> x.disable())
@@ -47,6 +48,8 @@ public class HttpSecurityConfig {
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers("/registerws").permitAll()
+//                        .requestMatchers(HttpMethod.OPTIONS, "/user/chats").permitAll()
+//                        .requestMatchers(HttpMethod.OPTIONS, "/chats").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
@@ -73,9 +76,11 @@ public class HttpSecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         var conf = new CorsConfiguration();
         conf.setAllowCredentials(true);
-        conf.addAllowedOrigin("*");
-        conf.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH"));
-        conf.addAllowedHeader("*");
+        conf.setAllowedOriginPatterns(List.of("*"));
+        conf.setAllowedHeaders(List.of("Authorization"));
+//        conf.addAllowedOrigin("*");
+        conf.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "DELETE", "PUT", "PATCH"));
+//        conf.addAllowedHeader("*");
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", conf);
         return source;

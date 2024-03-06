@@ -66,6 +66,23 @@
             }
         }
 
+        async function download() {
+            const response1 = await fetch(`http://localhost:${port}/user/chats`, {
+                headers: {
+                    "Authorization": `Bearer ${users['tomisław']}`
+                }
+            })
+
+            const response2 = await fetch(`http://localhost:${port}/chat/1/messages`, {
+                headers: {
+                    "Authorization": `Bearer ${users['tomisław']}`
+                }
+            })
+
+            console.log(await response1.json())
+            console.log(await response2.json())
+        }
+
         async function sendMessage() {
             client.publish({
                 destination: "/chat/message",
@@ -86,6 +103,7 @@
         <button id="yeti-connect_btn" onclick="connect('yeti')">Połącz jako Yeti</button>
         <button id="disconnect_btn" onclick="disconnect()">Disconnect</button>
         <button id="send-message_btn" onclick="sendMessage()">Send Message</button>
+        <button id="sendn" onclick="download()" style="border: 4px solid red;">CORS TEST</button>
     </div>
 
     <!--    <button id="sub_btn" onclick="subscribe()">Subscribe</button>-->

@@ -21,7 +21,7 @@ import java.security.Principal;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
+//@CrossOrigin
 public class MessageController {
 
     final MessageQueryService messageQueryService;
