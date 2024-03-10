@@ -31,8 +31,7 @@ public class MessageController {
             "@chatParticipantValidator.isUserChatMember(principal, #chatId)"
     )
     ResponseEntity<Slice<ChatMessageDto>> queryMessages(@PathVariable Long chatId, @ParameterObject Pageable pageable) {
-        var correctedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.unsorted());
-        var messages = messageQueryService.queryMessages(chatId, correctedPageable);
+        var messages = messageQueryService.queryMessages(chatId, pageable);
         return ResponseEntity.ok(messages);
     }
 

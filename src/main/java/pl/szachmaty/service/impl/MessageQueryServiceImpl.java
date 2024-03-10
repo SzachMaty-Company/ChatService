@@ -18,7 +18,7 @@ public class MessageQueryServiceImpl implements MessageQueryService {
 
     @Override
     public Slice<ChatMessageDto> queryMessages(Long chatId, Pageable pageable) {
-        return messageRepository.findMessagesByChatIdOrderByTimestamp(chatId, pageable)
+        return messageRepository.findMessagesByChatId(chatId, pageable)
                 .map(m -> modelMapper.map(m, ChatMessageDto.class));
     }
 }

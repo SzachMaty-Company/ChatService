@@ -7,6 +7,6 @@ import pl.szachmaty.model.entity.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Slice<Message> findMessagesByChatIdOrderByTimestamp(Long chatId, Pageable pageable);
+    Slice<Message> findMessagesByChatId(Long chatId, Pageable pageable);
 
 }
