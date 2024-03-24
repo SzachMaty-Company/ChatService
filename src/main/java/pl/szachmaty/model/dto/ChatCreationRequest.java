@@ -9,6 +9,6 @@ import java.util.Set;
 @Setter
 public class ChatCreationRequest {
 
-    private Set<String> chatMembersIds;
+    Set<ChatMemberDto> chatMembers;
 
 }

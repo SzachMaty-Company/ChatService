@@ -3,7 +3,6 @@ package pl.szachmaty.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -23,6 +22,7 @@ import pl.szachmaty.service.ChatParticipantQueryService;
 import pl.szachmaty.service.MessageSendingService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 //@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
@@ -54,15 +54,12 @@ public class ChatController {
         messageSendingService.sendMessage(message, user);
     }
 
-    @Profile({"dev", "local"})
     @Operation(description = "for internal purposes only, don't use it")
-    @PostMapping(path = "/chat")
+    @PostMapping(path = "/internal/chat")
     ResponseEntity<ChatCreationResponse> createChat(@RequestBody ChatCreationRequest chatCreationRequest) {
-        var chat = chatCreationService.createChat(chatCreationRequest);
+        var chat = chatCreationService.createChat(chatCreationRequest.getChatMembers());
         var chatCreationResponse = new ChatCreationResponse(chat.getId());
 
         return ResponseEntity.ok(chatCreationResponse);
     }
-
-
 }
