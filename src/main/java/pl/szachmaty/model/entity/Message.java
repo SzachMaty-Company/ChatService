@@ -24,6 +24,7 @@ public class Message {
     private LocalDateTime timestamp;
 
     private String message;
+    private String type;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "sender_id")

@@ -27,6 +27,7 @@ public class MessageFactory {
 
     public ChatMessageDto createDto(Message message) {
         ChatMessageDto dto = new ChatMessageDto();
+        dto.setType(message.getType() == null ? "MESSAGE" : message.getType());
         dto.setMessage(HtmlUtils.htmlEscape(message.getMessage()));
         dto.setTimestamp(message.getTimestamp());
         dto.setChatId(message.getChat().getId());

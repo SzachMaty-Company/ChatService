@@ -20,6 +20,7 @@ create table if not exists chat_service.message (
     chat_id int not null,
     "timestamp" timestamp null default now(),
     message text not null,
+    type text not null,
 
     constraint fk_user foreign key (sender_id) references chat_service.user (id),
     constraint fk_chat foreign key (chat_id) references chat_service.chat (id)

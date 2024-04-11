@@ -22,6 +22,7 @@ import pl.szachmaty.service.ChatParticipantQueryService;
 import pl.szachmaty.service.MessageSendingService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -62,4 +63,16 @@ public class ChatController {
 
         return ResponseEntity.ok(chatCreationResponse);
     }
+
+    @Operation(description = "for internal purposes only, don't use it")
+    @PostMapping(path = "/internal/game/invite")
+    ResponseEntity<?> sendInviteInChat(@RequestBody GameInviteDto gameInviteDto) {
+        try {
+            messageSendingService.sendGameInvite(gameInviteDto);
+            return ResponseEntity.ok().build();
+        } catch (Exception ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
