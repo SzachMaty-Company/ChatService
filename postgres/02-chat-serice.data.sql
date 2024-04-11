@@ -10,16 +10,16 @@ insert into chat_service.chat (id) values (2);
 insert into chat_service.user_chat (user_id, chat_id) values (1, 1);
 insert into chat_service.user_chat (user_id, chat_id) values (2, 1);
 
-insert into chat_service.message (sender_id, chat_id, message) values (1, 1, 'chat 1 message 1');
-insert into chat_service.message (sender_id, chat_id, message) values (2, 1, 'chat 1 message 2');
-insert into chat_service.message (sender_id, chat_id, message) values (1, 1, 'chat 1 message 3');
+insert into chat_service.message (sender_id, chat_id, message, type) values (1, 1, 'chat 1 message 1', 'MESSAGE');
+insert into chat_service.message (sender_id, chat_id, message, type) values (2, 1, 'chat 1 message 2', 'MESSAGE');
+insert into chat_service.message (sender_id, chat_id, message, type) values (1, 1, 'chat 1 message 3', 'MESSAGE');
 
 insert into chat_service.user_chat (user_id, chat_id) values (2, 2);
 insert into chat_service.user_chat (user_id, chat_id) values (3, 2);
 
-insert into chat_service.message (sender_id, chat_id, message) values (2, 2, 'chat 2 message 1');
-insert into chat_service.message (sender_id, chat_id, message) values (3, 2, 'chat 2 message 2');
-insert into chat_service.message (sender_id, chat_id, message) values (2, 2, 'chat 2 message 3');
+insert into chat_service.message (sender_id, chat_id, message, type) values (2, 2, 'chat 2 message 1', 'MESSAGE');
+insert into chat_service.message (sender_id, chat_id, message, type) values (3, 2, 'chat 2 message 2', 'MESSAGE');
+insert into chat_service.message (sender_id, chat_id, message, type) values (2, 2, 'chat 2 message 3', 'MESSAGE');
 
 alter table chat_service."user" alter column id restart with 2000;
 alter table chat_service.chat alter column id restart with 2000;

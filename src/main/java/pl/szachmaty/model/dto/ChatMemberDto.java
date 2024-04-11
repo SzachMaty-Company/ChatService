@@ -8,7 +8,7 @@ import pl.szachmaty.model.value.UserId;
 @Setter
 public class ChatMemberDto {
 
-    private UserId userId;
+    private String userId;
     private String username;
 
 }

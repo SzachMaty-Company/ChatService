@@ -37,9 +37,10 @@ public class HttpSecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain httpSecurity(HttpSecurity http) throws Exception {
+    @Order(50)
+    SecurityFilterChain httpSecurity1(HttpSecurity http) throws Exception {
         return http
-//                .securityMatcher("/registerws", "/chat/**", "/user/**")
+                .securityMatcher("/registerws", "/chat/**", "/user/**")
                 .cors(x -> x.configurationSource(corsConfigurationSource()))
                 .csrf(x -> x.disable())
                 .httpBasic(x -> x.disable())
@@ -52,6 +53,19 @@ public class HttpSecurityConfig {
 //                        .requestMatchers(HttpMethod.OPTIONS, "/chats").permitAll()
                         .anyRequest().authenticated()
                 )
+                .build();
+    }
+
+    @Bean
+    @Order(49)
+    SecurityFilterChain httpSecurity2(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/internal/**")
+                .csrf(x -> x.disable())
+                .httpBasic(x -> x.disable())
+                .formLogin(x -> x.disable())
+                .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(x -> x.anyRequest().permitAll())
                 .build();
     }
 

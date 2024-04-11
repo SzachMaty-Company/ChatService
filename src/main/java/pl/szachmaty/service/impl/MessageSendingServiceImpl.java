@@ -4,8 +4,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import pl.szachmaty.model.InviteFactory;
 import pl.szachmaty.model.MessageFactory;
 import pl.szachmaty.model.dto.ChatMessageDto;
+import pl.szachmaty.model.dto.GameInviteDto;
 import pl.szachmaty.model.dto.Message;
 import pl.szachmaty.model.entity.User;
 import pl.szachmaty.model.repository.ChatRepository;
@@ -22,6 +24,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
     private final ChatRepository chatRepository;
     private final ChatParticipantValidator chatParticipantValidator;
     private final MessageFactory messageFactory;
+    private final InviteFactory inviteFactory;
 
     public MessageSendingServiceImpl(MessageRepository messageRepository, UserRepository userRepository, SimpMessagingTemplate simpMessagingTemplate, ChatRepository chatRepository, ChatParticipantValidator chatParticipantValidator) {
         this.messageRepository = messageRepository;
@@ -29,6 +32,7 @@ public class MessageSendingServiceImpl implements MessageSendingService {
         this.chatRepository = chatRepository;
         this.chatParticipantValidator = chatParticipantValidator;
         this.messageFactory = new MessageFactory(chatRepository, userRepository);
+        this.inviteFactory = new InviteFactory(chatRepository, userRepository);
     }
 
     @Override
@@ -43,6 +47,19 @@ public class MessageSendingServiceImpl implements MessageSendingService {
         var messageDto = messageFactory.createDto(savedMessage);
 
         var chat = chatRepository.findChatFetchMembers(savedMessage.getChat().getId()).orElseThrow();
+
+        for (var member : chat.getChatMembers()) {
+            simpMessagingTemplate.convertAndSendToUser(member.getUserId().getId(), "/queue/messages", messageDto);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void sendGameInvite(GameInviteDto gameInviteDto) {
+        var invite = messageRepository.save(inviteFactory.createInvite(gameInviteDto));
+        var messageDto = messageFactory.createDto(invite);
+
+        var chat = chatRepository.findChatFetchMembers(invite.getChat().getId()).orElseThrow();
 
         for (var member : chat.getChatMembers()) {
             simpMessagingTemplate.convertAndSendToUser(member.getUserId().getId(), "/queue/messages", messageDto);
