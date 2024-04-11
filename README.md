@@ -29,7 +29,8 @@ payload structure
     "chatId": "<number>",
     "senderId": "<string>",
     "timestamp": "<string>",
-    "message": "<string>"
+    "message": "<string>",
+    "type": "MESSAGE|INVITE"
 }
 ```
 - (stomp) `SEND` _/chat/message_ - for sending messages
