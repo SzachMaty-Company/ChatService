@@ -41,21 +41,16 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     boolean existsChatWithUser(long userId, long chatId);
 
     @Query(value = """
-                select ch.id as id,
-                       ch.created_at as chatMembers
-                from chat_service.chat ch
-                where ch.id = (
-                    select uch1.chat_id
-                    from chat_service.user_chat uch1
-                    join chat_service.user u1 on u1.global_user_id = :inviteSenderId
-                    where uch1.user_id = u1.id
-                    intersect
-                    select uch2.chat_id
-                    from chat_service.user_chat uch2
-                    join chat_service.user u2 on u2.global_user_id = :inviteReceiverId
-                    where uch2.user_id = u2.id
-                )
+                select uch1.chat_id
+                from chat_service.user_chat uch1
+                join chat_service.user u1 on u1.global_user_id = :inviteSenderId
+                where uch1.user_id = u1.id
+                intersect
+                select uch2.chat_id
+                from chat_service.user_chat uch2
+                join chat_service.user u2 on u2.global_user_id = :inviteReceiverId
+                where uch2.user_id = u2.id
     """, nativeQuery = true)
-    Optional<Chat> findChatByMembersIds(String inviteSenderId, String inviteReceiverId);
+    Optional<Long> findChatByMembersIds(String inviteSenderId, String inviteReceiverId);
 
 }
