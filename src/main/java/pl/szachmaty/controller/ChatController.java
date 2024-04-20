@@ -3,6 +3,7 @@ package pl.szachmaty.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.results.graph.embeddable.internal.AggregateEmbeddableFetchImpl;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +62,7 @@ public class ChatController {
     @Operation(description = "for internal purposes only, don't use it")
     @PostMapping(path = "/internal/chat")
     ResponseEntity<ChatCreationResponse> createChat(@RequestBody ChatCreationRequest chatCreationRequest) {
+        log.info("friend add input dto: " + chatCreationRequest.toString());
         try {
             var chat = chatCreationService.createChat(chatCreationRequest.getChatMembers());
             var chatCreationResponse = new ChatCreationResponse(chat.getId());
@@ -75,6 +77,7 @@ public class ChatController {
     @Operation(description = "for internal purposes only, don't use it")
     @PostMapping(path = "/internal/game/invite")
     ResponseEntity<?> sendInviteInChat(@RequestBody GameInviteDto gameInviteDto) {
+        log.info("invite send input dto: " + gameInviteDto.toString());
         try {
             messageSendingService.sendGameInvite(gameInviteDto);
             return ResponseEntity.ok().build();
