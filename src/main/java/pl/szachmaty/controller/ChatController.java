@@ -2,6 +2,7 @@ package pl.szachmaty.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,10 +22,12 @@ import pl.szachmaty.service.ChatListService;
 import pl.szachmaty.service.ChatParticipantQueryService;
 import pl.szachmaty.service.MessageSendingService;
 
+import java.lang.annotation.Repeatable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @RestController
 //@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
 @AllArgsConstructor
@@ -58,10 +61,15 @@ public class ChatController {
     @Operation(description = "for internal purposes only, don't use it")
     @PostMapping(path = "/internal/chat")
     ResponseEntity<ChatCreationResponse> createChat(@RequestBody ChatCreationRequest chatCreationRequest) {
-        var chat = chatCreationService.createChat(chatCreationRequest.getChatMembers());
-        var chatCreationResponse = new ChatCreationResponse(chat.getId());
+        try {
+            var chat = chatCreationService.createChat(chatCreationRequest.getChatMembers());
+            var chatCreationResponse = new ChatCreationResponse(chat.getId());
 
-        return ResponseEntity.ok(chatCreationResponse);
+            return ResponseEntity.ok(chatCreationResponse);
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Operation(description = "for internal purposes only, don't use it")
@@ -71,6 +79,7 @@ public class ChatController {
             messageSendingService.sendGameInvite(gameInviteDto);
             return ResponseEntity.ok().build();
         } catch (Exception ex) {
+            log.error(ex.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
