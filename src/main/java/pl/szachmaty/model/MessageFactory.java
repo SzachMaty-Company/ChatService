@@ -21,6 +21,7 @@ public class MessageFactory {
         return Message.builder()
                 .message(message.getMessage())
                 .chat(chatRepository.getReferenceById(message.getChatId()))
+                .type("MESSAGE")
                 .sender(userRepository.getReferenceById(sender.getId()))
                 .build();
     }
