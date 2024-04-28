@@ -1,6 +1,7 @@
 package pl.szachmaty.model;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import pl.szachmaty.model.dto.ChatMemberDto;
 import pl.szachmaty.model.entity.Chat;
 import pl.szachmaty.model.entity.User;
@@ -11,6 +12,7 @@ import pl.szachmaty.model.value.UserId;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ChatFactory {
 
     private final UserRepository userRepository;
@@ -23,6 +25,8 @@ public class ChatFactory {
 
     @Transactional
     public Chat create(Set<ChatMemberDto> chatMembers) {
+        chatMembers.forEach(u -> log.info("user for chat creation: " + u));
+
         var users = chatMembers.stream()
                 .map(this::findOrCreateUser)
                 .collect(Collectors.toSet());

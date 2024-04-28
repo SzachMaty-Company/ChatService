@@ -1,16 +1,13 @@
 package pl.szachmaty.model.repository;
 
-import jakarta.persistence.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pl.szachmaty.model.dto.ChatListItem;
 import pl.szachmaty.model.entity.Chat;
-import pl.szachmaty.model.entity.User;
 
 import java.util.Optional;
-import java.util.Set;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
@@ -18,22 +15,28 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     Optional<Chat> findChatFetchMembers(Long chatId);
 
     @Query(value = """
-                select m.message as message,
-                       m.id as messageId,
-                       m."timestamp" as messageTimestamp,
-                       u.global_user_id as senderId,
-                       u.username as username,
-                       uch.chat_id as chatId
-                from (select mm.chat_id,
-                             max(mm."timestamp") as last_message_timestamp
-                      from chat_service."message" mm
-                      group by mm.chat_id
-                      order by max(mm."timestamp")
-                      ) sq
-                         join chat_service."message" m on m."timestamp" = sq.last_message_timestamp
-                         join chat_service.user_chat uch on uch.chat_id = sq.chat_id
-                         join chat_service."user" u on uch.user_id = u.id
-                where u.global_user_id = :userId
+        select
+            xxx.chat_id as chatId,
+            xxx.max_timestamp as messageTimestamp,
+            m.message as message,
+            m.id as messageId,
+            u.global_user_id as senderId,
+            u.username as username
+        from (
+            select
+                ch.id as chat_id,
+                max(m.timestamp) as max_timestamp
+            from chat_service.chat ch
+            join chat_service.user_chat uch on uch.chat_id = ch.id
+            join chat_service.user uu on uch.user_id = uu.id
+            left join chat_service.message m on ch.id = m.chat_id
+            where uu.global_user_id = :userId
+            group by ch.id
+        ) xxx
+        left join chat_service.message m on xxx.max_timestamp = m.timestamp and
+                                            xxx.chat_id = m.chat_id
+        left join chat_service.user u on m.sender_id = u.id
+        order by messageTimestamp desc
     """, nativeQuery = true)
     Slice<ChatListItem> getUserChats(String userId, Pageable pageable);
 

@@ -1,6 +1,7 @@
 package pl.szachmaty.model.dto;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
 public interface ChatListItem {
 
